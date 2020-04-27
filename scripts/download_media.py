@@ -54,7 +54,7 @@ def download_s3(s3path,odir):
     if not os.path.exists(odir):
         os.makedirs(odir)
     s3bucket = s3path.split('s3://')[1].split('/')[0]
-    cmd = aws_cmd + ' s3api get-bucket-location --bucket ' + s3bucket + " | grep -Po '(?" + '<="LocationConstraint": ")[^"]*'+ "'"
+    cmd = aws_cmd + ' s3api get-bucket-location --region cn-north-1 --bucket ' + s3bucket + " | grep -Po '(?" + '<="LocationConstraint": ")[^"]*'+ "'"
     s3bucketregion = subprocess.Popen([cmd], env=new_env, stdout=subprocess.PIPE, shell=True)
     s3bucketregion = s3bucketregion.stdout.read().rstrip()
     print 'Will download HANA media from ' + s3path + ' To ' + odir
@@ -64,6 +64,7 @@ def download_s3(s3path,odir):
         cmd = cmd + ' ' + odir
     else:
         cmd = cmd + ' ' + odir + ' --region ' + s3bucketregion
+    print cmd
     if not os.path.exists(odir):
         os.makedirs(odir)
     print 'Executing ' + cmd
@@ -71,6 +72,8 @@ def download_s3(s3path,odir):
     (out, err) = output.communicate()
     cmd = 'chmod 755 ' + odir + '/*.exe'
     output = exe_cmd(cmd)
+
+
 
 def main():
     parser = argparse.ArgumentParser(description='Download HANA Media (No extraction)')
